@@ -368,7 +368,7 @@ meta def mk_lt_zero_pf_aux (c : ineq) (pf npf : expr) (coeff : ℕ) : tactic (in
 do tp ← infer_type npf,
    some (iq, e) ← return $ parse_into_comp_and_expr tp,
    nm ← resolve_name (ineq_const_mul_nm iq),
-   if ¬ coeff = 0 then do
+   if coeff ≠ 0 then do
      h' ← to_expr ``(%%nm.mk_explicit _ _ _ %%(nat.to_pexpr coeff) %%npf (by norm_num)),
      (nm, niq) ← return $ ineq_const_nm c iq,
      e' ← mk_app nm [pf, h'],
@@ -391,9 +391,10 @@ meta def mk_lt_zero_pf : list ℕ → list expr → tactic expr
 | [c] [h] := 
   do tp ← infer_type h,
    some (iq, e) ← return $ parse_into_comp_and_expr tp,
-   match iq with 
-   | ineq.lt := to_expr ``(@mul_neg _ _ _ %%(nat.to_pexpr c) %%e (by norm_num)) ff
-   | _ := fail "error in linarith.mk_lt_zero_pf : not an lt"
+   match iq, c with 
+   | _, 0 := fail "error in linarith.mk_lt_zero_pf : found coefficient 0"
+   | ineq.lt, _ := to_expr ``(@mul_neg _ _ _ %%(nat.to_pexpr c) %%e (by norm_num)) ff
+   | _, _ := fail "error in linarith.mk_lt_zero_pf : not an lt"
    end  
 | (c::ct) (h::t) := 
   do tp ← infer_type h,
@@ -509,7 +510,82 @@ meta def prove_false_by_linarith (cfg : linarith_config) (l : list expr) : tacti
 do ls ← l.mmap (λ h, (do s ← norm_hyp h, return (some s)) <|> return none),
    prove_false_by_linarith1 cfg ls.reduce_option
 
+#check expr.is_numeral
+
+meta def is_numeric : expr → option ℚ 
+| `(%%e1 + %%e2) := do v1 ← is_numeric e1, v2 ← is_numeric e2, return $ v1 + v2
+| `(%%e1 - %%e2) := do v1 ← is_numeric e1, v2 ← is_numeric e2, return $ v1 - v2
+| `(%%e1 * %%e2) := do v1 ← is_numeric e1, v2 ← is_numeric e2, return $ v1 * v2
+| `(%%e1 / %%e2) := do v1 ← is_numeric e1, v2 ← is_numeric e2, return $ v1 / v2
+| `(-%%e) := rat.neg <$> is_numeric e
+| e := e.to_rat
+
+meta def find_cancel_factor : expr → option ℕ
+| `(%%e1 + %%e2) := do v1 ← find_cancel_factor e1, v2 ← find_cancel_factor e2, return $ v1.lcm v2
+| `(%%e1 - %%e2) := do v1 ← find_cancel_factor e1, v2 ← find_cancel_factor e2, return $ v1.lcm v2
+| `(%%e1 * %%e2) := do v1 ← find_cancel_factor e1, v2 ← find_cancel_factor e2, return $ v1 * v2
+| `(%%e1 / %%e2) := do q ← is_numeric e2, return q.num.nat_abs
+| `(-%%e) := find_cancel_factor e 
+| _ := return 1
+
+meta def find_cancel_factor' : expr → ℕ × bin_tree ℕ
+| `(%%e1 + %%e2) := 
+  let (v1, t1) := find_cancel_factor e1, (v2, t2) := find_cancel_factor e2 in 
+  return $ v1.lcm v2
+| `(%%e1 - %%e2) := do v1 ← find_cancel_factor e1, v2 ← find_cancel_factor e2, return $ v1.lcm v2
+| `(%%e1 * %%e2) := do v1 ← find_cancel_factor e1, v2 ← find_cancel_factor e2, return $ v1 * v2
+| `(%%e1 / %%e2) := do q ← is_numeric e2, return q.num.nat_abs
+| `(-%%e) := find_cancel_factor e 
+| _ := return 1
+
+#check left_distrib
+lemma add_subst {α} [ring α] {n e1 e2 t1 t2 : α} (h1 : n * e1 = t1) (h2 : n * e2 = t2) : 
+      n * (e1 + e2) = t1 + t2 := by simp [left_distrib, *]
+
+lemma sub_subst {α} [ring α] {n e1 e2 t1 t2 : α} (h1 : n * e1 = t1) (h2 : n * e2 = t2) : 
+      n * (e1 - e2) = t1 - t2 := by simp [left_distrib, *]
+
+lemma neg_subst {α} [ring α] {n e t : α} (h1 : n * e = t) : n * (-e) = -t := by simp *
+
+lemma mul_subst {α} [comm_ring α] {n1 n2 e1 e2 t1 t2 : α} (h1 : n1 * e1 = t1) (h2 : n2 * e2 = t2) : 
+      n1*n2 * (e1 * e2) = t1 * t2 := 
+by rw [mul_comm n1, mul_assoc n2, ←mul_assoc n1, h1, ←mul_assoc n2, mul_comm n2, mul_assoc, h2] -- OUCH
+
+lemma div_subst {α} [field α] {n1 n2 e1 e2 t1 t2 : α} (h1 : n1 * e1 = t1) (h2 : n2 / e2 = t2) :
+      n1 * n2 * (e1 / e2) = t2 * t1 := 
+by rw [mul_assoc, mul_div_comm, h2, ←mul_assoc, h1, mul_comm]
+
+meta def mk_prod_prf_aux (mk_prod_prf : expr → expr → tactic pexpr) : expr → expr → tactic pexpr 
+| `(%%n1 * %%n2) `(%%e1 * %%e2) := do v1 ← mk_prod_prf n1 e1, v2 ← mk_prod_prf n2 e2, return ``(mul_subst %%v1 %%v2)
+| `(%%n1 * %%n2) `(%%e1 / %%e2) := do (_, np) ← to_expr ``(%%n2 / %%e2) >>= norm_num, v1 ← mk_prod_prf n1 e1, return ``(div_subst %%v1 %%np)
+| a b := trace a >> trace b >> fail "need product of coeffs for mul and dvd"
+
+/--
+  first argument: an expr n representing a numeral or product of numerals
+  second argument: a term t
+  output: a proof that n*t = something.
+-/
+meta def mk_prod_prf : expr → expr → tactic pexpr
+| n `(%%e1 + %%e2) := do v1 ← mk_prod_prf n e1, v2 ← mk_prod_prf n e2, return ``(add_subst %%v1 %%v2)
+| n `(%%e1 - %%e2) := do v1 ← mk_prod_prf n e1, v2 ← mk_prod_prf n e2, return ``(sub_subst %%v1 %%v2)
+| n e@`(%%e1 * %%e2) := mk_prod_prf_aux mk_prod_prf n e
+| n e@`(%%e1 / %%e2) := mk_prod_prf_aux mk_prod_prf n e
+| n `(-%%e) := do v ← mk_prod_prf n e, return ``(sub_subst %%v)
+| n e := return ``(refl (%%n*%%e))
+
 end prove
+
+open tactic 
+constants (x y : ℚ) (P : ℚ → Prop)
+#eval find_cancel_factor `((2/3)*((1/3)*x + 4) + 3*y)
+run_cmd do tp ← mk_prod_prf `(((3*1)*((3*1)*1)) : ℚ) `((2/3)*((1/3)*x + 4) + 3*y) >>= to_expr >>= infer_type,
+ trace tp,
+ `(%%a = %%b) ← return tp, 
+ btp ← infer_type b,
+ mv ← mk_meta_var btp,
+ ex ← to_expr ``(%%b = %%mv),
+ (p, q) ← solve_aux ex /- `(%%b = (%%mv : %%btp)) -/  `[norm_num, trace_state],
+ infer_type q >>= trace 
 
 end linarith
 
@@ -541,5 +617,3 @@ meta def tactic.interactive.linarith (ids : parse (many ident))
 linarith.interactive_aux cfg ids using_hyps
 
 end
-
-#check le_antisymm

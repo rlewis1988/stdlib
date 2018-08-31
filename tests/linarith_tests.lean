@@ -1,5 +1,5 @@
 import tactic.linarith
- 
+
 example (a b c : ℚ)  (h2 : b + 2 > 3 + b) : false :=
 by linarith {discharger := `[ring SOP]}
 
