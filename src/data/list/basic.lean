@@ -3249,38 +3249,16 @@ end
 | l₁         [] := by simp
 | (h₁ :: l₁) (h₂ :: l₂) :=
 begin
-  dsimp [list.bag_inter],
-  simp only [list.mem_cons_iff],
-  by_cases p₁ : h₁ = h₂,
-  { subst p₁,
-    simp only [list.erase_cons_head, if_true, list.mem_cons_iff, true_or, eq_self_iff_true],
-    repeat { rw count_cons' },
-    by_cases p₂ : a = h₁,
-    { rw [count_bag_inter, p₂],
-      simp only [if_true, add_comm, eq_self_iff_true],
-      rw min_add_add_left, },
-    { rw [if_neg p₂, count_bag_inter, add_zero, add_zero, add_zero], } },
-  { simp only [*, list.mem_cons_iff, false_or],
-    split_ifs,
-    { rw [list.erase_cons, if_neg (ne.symm p₁), count_cons', count_cons', count_cons',
-          count_bag_inter, count_cons'],
-      split_ifs with p₂ p₃ p₃,
-      { exact false.elim (p₁ (eq.trans p₃.symm p₂)), },
-      { simp only [add_zero],
-        rw [count_erase_of_ne p₃], },
-      { simp only [add_zero],
-        rw [←p₃, count_erase_self, ←min_add_add_right],
-        conv { to_lhs, congr, skip, rw [add_one] },
-        rw succ_pred_eq_of_pos,
-        subst p₃,
-        exact count_pos.2 h },
-      { simp only [add_zero],
-        rw count_erase_of_ne p₃, } },
-    { rw count_bag_inter,
-      by_cases p₂ : a = h₁,
-      { rw [p₂, count_cons', if_neg p₁, count_eq_zero_of_not_mem h],
-        simp only [add_zero, list.count_cons_self, eq_self_iff_true, nat.min_zero] },
-      { conv {to_rhs, rw [count_cons', if_neg p₂, add_zero], } } } }
+  simp only [list.bag_inter, list.mem_cons_iff],
+  by_cases p₁ : h₁ = h₂; by_cases p₂ : a = h₁,
+  { simp [eq.symm p₁, eq.symm p₂, count_bag_inter, min_succ_succ] },
+  { simp [eq.symm p₁, p₂, count_bag_inter, count_cons] },
+  { rw ←p₂ at p₁,
+    by_cases p₃ : a ∈ l₂,
+    { simp [p₁, ne.symm p₁, eq.symm p₂, p₃, list.erase_cons, count_bag_inter,
+            eq.symm (min_succ_succ _ _), succ_pred_eq_of_pos (count_pos.2 p₃)] },
+    { simp [p₁, eq.symm p₂, p₃] } },
+  { by_cases p₄ : h₁ ∈ l₂; simp [p₁, p₂, p₄, count_bag_inter] }
 end
 
 theorem bag_inter_sublist_left : ∀ l₁ l₂ : list α, l₁.bag_inter l₂ <+ l₁
