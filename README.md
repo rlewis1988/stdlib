@@ -9,7 +9,7 @@ abcde
 
 ## Lean standard library
 
-Besides [Lean's general documentation](https://leanprover.github.io/documentation/), the documentation of mathlib consists of:
+Besides [Lean's general documentation](https://leanprover.github.io/documentation/), the documentation of mathlib consists of: xxx
 
 - A [guide](docs/elan.md) on installing Lean and mathlib with elan.
 - A description of [currently covered theories](docs/theories.md),
