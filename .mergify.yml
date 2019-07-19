@@ -12,6 +12,21 @@ pull_request_rules:
         method: squash
         strict: smart
         strict_method: merge
+        
+pull_request_rules:
+  - name: heres a random name
+    conditions:
+      #- status-success=continuous-integration/travis-ci/pr
+      - "#changes-requested-reviews-by=0"
+      - base=master
+      - label=ready-to-merge
+      #- approved-reviews-by=@leanprover-community/mathlib-maintainers
+    actions:
+     delete_head_branch: {}
+     merge:
+        method: squash
+        strict: smart
+        strict_method: merge        
 
 # rule used to protect master branch
   - name: approved by maintainer
