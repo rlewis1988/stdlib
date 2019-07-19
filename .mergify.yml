@@ -32,7 +32,7 @@ pull_request_rules:
 # rule used to protect master branch
   - name: approved by maintainer
     conditions:
-      - approved-reviews-by=@robertylewis
+      - label=iapprove
     actions: 
       label:
         add: [approved]
