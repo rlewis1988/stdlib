@@ -33,7 +33,9 @@ pull_request_rules:
   - name: approved by maintainer
     conditions:
       - approved-reviews-by=@robertylewis
-    actions: {}
+    actions: 
+      label:
+        add: [approved]
 
  # In practice this turns out to be really annoying.
  # - name: remove outdated reviews
