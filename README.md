@@ -62,7 +62,6 @@ chmod +x .git/hooks/post-checkout
 
 ## Maintainers (topics):
 
-
 * Jeremy Avigad (@avigad): analysis
 * Reid Barton (@rwbarton): category theory, topology
 * Mario Carneiro (@digama0): all (lead maintainer)
