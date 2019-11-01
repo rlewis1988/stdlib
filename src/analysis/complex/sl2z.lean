@@ -36,6 +36,18 @@ def SL2Z := SL 2 ℤ
 
 namespace SL2Z
 
+def of_tuple_aux (a b c d : ℤ) : matrix (fin 2) (fin 2) ℤ
+| ⟨0, _⟩ ⟨0, _⟩ := a
+| ⟨0, _⟩ ⟨1, _⟩ := b
+| ⟨1, _⟩ ⟨0, _⟩ := c
+| ⟨1, _⟩ ⟨1, _⟩ := d
+| _ _ := 0
+
+meta def nn : tactic unit := `[norm_num]
+
+def of_tuple (a b c d : ℤ) (h : a*d - b*c = 1 . nn) : SL2Z :=
+⟨of_tuple_aux a b c d, show (1*(a*(d*1))) + (((-1)*(c*(b*1))) + 0) = 1, by convert h using 1; ring⟩
+
 variable (m : SL2Z)
 def a := m.val ⟨0, dec_trivial⟩ ⟨0, dec_trivial⟩
 def b := m.val ⟨0, dec_trivial⟩ ⟨1, dec_trivial⟩
@@ -47,6 +59,11 @@ def d := m.val ⟨1, dec_trivial⟩ ⟨1, dec_trivial⟩
 @[simp] lemma c_def {p q} : m.val ⟨1, p⟩ ⟨0, q⟩ = m.c := rfl
 @[simp] lemma d_def {p q} : m.val ⟨1, p⟩ ⟨1, q⟩ = m.d := rfl
 
+@[simp] lemma a_of_tuple (a b c d h) : (of_tuple a b c d h).a = a := rfl
+@[simp] lemma b_of_tuple (a b c d h) : (of_tuple a b c d h).b = b := rfl
+@[simp] lemma c_of_tuple (a b c d h) : (of_tuple a b c d h).c = c := rfl
+@[simp] lemma d_of_tuple (a b c d h) : (of_tuple a b c d h).d = d := rfl
+
 lemma det_reduce : m.val.det = (1*(m.a*(m.d*1))) + (((-1)*(m.c*(m.b*1))) + 0) :=
 rfl
 
@@ -56,17 +73,13 @@ by simpa using m.det_reduce
 lemma det_eq_one : m.a * m.d - m.c * m.b = 1 :=
 by rw [←det, m.property]
 
-private def val_inv : matrix (fin 2) (fin 2) ℤ
-| ⟨0, _⟩ ⟨0, _⟩ := m.d
-| ⟨0, _⟩ ⟨1, _⟩ := -m.b
-| ⟨1, _⟩ ⟨0, _⟩ := -m.c
-| ⟨1, _⟩ ⟨1, _⟩ := m.a
-| _ _ := 0
+private def val_inv : matrix (fin 2) (fin 2) ℤ :=
+of_tuple_aux m.d (-m.b) (-m.c) m.a
 
 lemma val_inv_mul_left : val_inv m * m.val = 1 :=
 begin
   ext i j, fin_cases i; fin_cases j; simp [matrix.mul_val]; show _ * _ +( _* _ + _) = _;
-  simp [val_inv]; ring; convert det_eq_one m using 1; ring
+  simp [val_inv, of_tuple_aux]; ring; convert det_eq_one m using 1; ring
 end
 
 lemma val_inv_det : (val_inv m).det = 1 :=
