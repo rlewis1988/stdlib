@@ -108,3 +108,8 @@ by rw [sub_eq, sub_eq]; from inf_le_inf h₁ (neg_le_neg h₂)
 end boolean_algebra
 
 end lattice
+
+attribute [instance, priority 900]
+  lattice.boolean_algebra.to_bounded_distrib_lattice
+  lattice.boolean_algebra.to_has_neg
+  lattice.boolean_algebra.to_has_sub

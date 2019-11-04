@@ -760,3 +760,26 @@ instance [bounded_distrib_lattice α] [bounded_distrib_lattice β] :
 { .. prod.lattice.bounded_lattice α β, .. prod.lattice.distrib_lattice α β }
 
 end prod
+
+attribute [instance, priority 900]
+  lattice.bounded_lattice.to_order_bot
+  lattice.order_top.to_has_top
+  lattice.order_bot.to_has_bot
+  lattice.semilattice_sup_bot.to_order_bot
+  lattice.semilattice_inf_bot.to_semilattice_inf
+  lattice.semilattice_sup_top_of_bounded_lattice
+  lattice.semilattice_inf_bot_of_bounded_lattice
+  lattice.order_bot.to_partial_order
+  lattice.semilattice_inf_top.to_order_top
+  lattice.order_top.to_partial_order
+  lattice.bounded_distrib_lattice.to_distrib_lattice
+  lattice.semilattice_inf_top_of_bounded_lattice
+  lattice.bounded_lattice.to_order_top
+  lattice.bounded_lattice.to_lattice
+  lattice.semilattice_sup_top.to_semilattice_sup
+  lattice.bounded_distrib_lattice.to_bounded_lattice
+  lattice.semilattice_sup_top.to_order_top
+  lattice.semilattice_inf_top.to_semilattice_inf
+  lattice.semilattice_sup_bot_of_bounded_lattice
+  lattice.semilattice_sup_bot.to_semilattice_sup
+  lattice.semilattice_inf_bot.to_order_bot

@@ -551,3 +551,14 @@ lemma directed_of_mono {ι} [decidable_linear_order ι] (f : ι → α)
 
 class directed_order (α : Type u) extends preorder α :=
 (directed : ∀ i j : α, ∃ k, i ≤ k ∧ j ≤ k)
+
+attribute [instance, priority 900]
+  is_order_connected_of_is_strict_total_order'
+  is_well_order.is_extensional
+  is_well_order.is_asymm
+  is_well_order.is_trichotomous
+  is_extensional_of_is_strict_total_order'
+  is_well_order.is_irrefl
+  is_well_order.is_strict_total_order
+  is_well_order.is_trans
+  is_strict_total_order_of_is_strict_total_order'

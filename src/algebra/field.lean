@@ -243,3 +243,8 @@ lemma map_div : f (x / y) = f x / f y :=
 end
 
 end is_field_hom
+
+attribute [instance, priority 900]
+  division_ring_has_div'
+  division_ring.to_domain
+  field.to_integral_domain

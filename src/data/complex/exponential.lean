@@ -414,6 +414,12 @@ by rw [← domain.mul_left_inj (exp_ne_zero x), ← exp_add];
 lemma exp_sub : exp (x - y) = exp x / exp y :=
 by simp [exp_add, exp_neg, div_eq_mul_inv]
 
+section
+
+local attribute [instance, priority 1000]
+  is_add_group_hom.to_is_add_monoid_hom
+  is_ring_hom.is_add_group_hom
+
 @[simp] lemma exp_conj : exp (conj x) = conj (exp x) :=
 begin
   dsimp [exp],
@@ -423,6 +429,8 @@ begin
   rw ← sum_hom conj,
   refine sum_congr rfl (λ n hn, _),
   rw [conj_div, conj_pow, ← of_real_nat_cast, conj_of_real]
+end
+
 end
 
 @[simp] lemma of_real_exp_of_real_re (x : ℝ) : ((exp x).re : ℂ) = exp x :=

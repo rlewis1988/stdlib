@@ -750,3 +750,13 @@ instance [ordered_comm_group α] : ordered_comm_group (order_dual α) :=
   ..show add_comm_group α, by apply_instance }
 
 end order_dual
+
+attribute [instance, priority 900]
+ nonneg_comm_group.to_add_comm_group
+ ordered_comm_monoid.to_add_comm_monoid
+ nonneg_comm_group.to_ordered_comm_group
+ canonically_ordered_monoid.to_order_bot
+ ordered_comm_monoid.to_partial_order
+ canonically_ordered_monoid.to_ordered_comm_monoid
+ decidable_linear_ordered_comm_group.decidable_linear_ordered_cancel_comm_monoid
+ ordered_cancel_comm_monoid.to_ordered_comm_monoid

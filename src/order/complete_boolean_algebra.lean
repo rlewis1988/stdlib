@@ -118,3 +118,9 @@ by simp [Sup_eq_supr, neg_supr]
 end complete_boolean_algebra
 
 end lattice
+
+attribute [instance, priority 900]
+  lattice.complete_distrib_lattice.to_complete_lattice
+  lattice.lattice.bounded_distrib_lattice
+  lattice.complete_boolean_algebra.to_boolean_algebra
+  lattice.complete_boolean_algebra.to_complete_distrib_lattice

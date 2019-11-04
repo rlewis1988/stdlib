@@ -165,6 +165,8 @@ instance : is_add_monoid_hom f :=
 instance : is_monoid_hom f :=
 { ..‹is_semiring_hom f› }
 
+attribute [instance, priority 900] is_semiring_hom.is_add_monoid_hom is_semiring_hom.is_monoid_hom
+
 end is_semiring_hom
 
 section
@@ -305,6 +307,8 @@ instance : is_semiring_hom f :=
 
 instance : is_add_group_hom f := { }
 
+attribute [instance, priority 900] is_ring_hom.is_add_group_hom is_ring_hom.is_semiring_hom
+
 end is_ring_hom
 
 set_option old_structure_cmd true
@@ -440,6 +444,12 @@ instance integral_domain.to_nonzero_comm_ring (α : Type*) [id : integral_domain
   nonzero_comm_ring α :=
 { ..id }
 
+attribute [instance, priority 900]
+  nonzero_comm_ring.to_comm_ring nonzero_comm_ring.to_zero_ne_one_class
+  nonzero_comm_ring.to_nonzero_comm_semiring integral_domain.to_nonzero_comm_ring
+  nonzero_comm_semiring.to_comm_semiring nonzero_comm_semiring.to_zero_ne_one_class
+
+
 /-- An element of the unit group of a nonzero commutative semiring represented as an element
     of the semiring is nonzero. -/
 lemma units.coe_ne_zero [nonzero_comm_semiring α] (u : units α) : (u : α) ≠ 0 :=
@@ -468,6 +478,8 @@ def has_div_of_division_ring [division_ring α] : has_div α := division_ring_ha
   the condition `a * b = 0 ↔ a = 0 ∨ b = 0`. Alternatively, a domain
   is an integral domain without assuming commutativity of multiplication. -/
 class domain (α : Type u) extends ring α, no_zero_divisors α, zero_ne_one_class α
+attribute [instance, priority 900]
+  domain.to_zero_ne_one_class domain.to_ring domain.to_no_zero_divisors
 
 section domain
   variable [domain α]
@@ -523,6 +535,7 @@ section
 
 /-- An integral domain is a domain. -/
   instance integral_domain.to_domain : domain α := {..s}
+  attribute [instance, priority 900] integral_domain.to_domain
 
 /-- Right multiplcation by a nonzero element of an integral domain is injective. -/
   theorem eq_of_mul_eq_mul_right_of_ne_zero {a b c : α} (ha : a ≠ 0) (h : b * a = c * a) : b = c :=

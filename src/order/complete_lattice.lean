@@ -832,3 +832,9 @@ instance [complete_lattice α] [complete_lattice β] : complete_lattice (α × �
   .. prod.lattice.has_Inf α β }
 
 end prod
+attribute [instance, priority 900]
+  lattice.complete_lattice.to_has_Sup
+  lattice.complete_linear_order.to_decidable_linear_order
+  lattice.complete_lattice.to_bounded_lattice
+  lattice.complete_lattice.to_has_Inf
+  lattice.complete_linear_order.to_complete_lattice

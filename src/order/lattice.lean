@@ -411,3 +411,14 @@ instance [distrib_lattice α] [distrib_lattice β] : distrib_lattice (α × β) 
   .. prod.lattice.lattice α β }
 
 end prod
+
+attribute [instance, priority 900]
+  lattice.semilattice_inf.to_partial_order
+  lattice.lattice_of_decidable_linear_order
+  lattice.semilattice_sup.to_has_sup
+  lattice.lattice.to_semilattice_sup
+  lattice.distrib_lattice.to_lattice
+  lattice.lattice.to_semilattice_inf
+  lattice.semilattice_sup.to_partial_order
+  lattice.distrib_lattice_of_decidable_linear_order
+  lattice.semilattice_inf.to_has_inf

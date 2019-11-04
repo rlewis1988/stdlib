@@ -586,3 +586,7 @@ begin
   { assume n, show int.nat_abs (normalize n) = n,
     rw [← int.coe_nat_abs_eq_normalize, int.nat_abs_of_nat, int.nat_abs_of_nat] }
 end
+
+attribute [instance, priority 900]
+  gcd_domain.to_normalization_domain
+  normalization_domain.to_integral_domain

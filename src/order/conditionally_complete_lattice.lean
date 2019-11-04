@@ -767,3 +767,15 @@ instance (α : Type*) [conditionally_complete_linear_order α] :
   ..order_dual.decidable_linear_order α }
 
 end order_dual
+
+attribute [instance, priority 900]
+  lattice.conditionally_complete_lattice.to_lattice
+  lattice.conditionally_complete_linear_order.to_decidable_linear_order
+  lattice.conditionally_complete_linear_order_bot.to_order_bot
+  lattice.conditionally_complete_lattice.to_has_Inf
+  lattice.conditionally_complete_linear_order_bot.to_decidable_linear_order
+  lattice.conditionally_complete_lattice.to_has_Sup
+  lattice.conditionally_complete_lattice_of_complete_lattice
+  lattice.conditionally_complete_linear_order_bot.to_conditionally_complete_lattice
+  lattice.conditionally_complete_linear_order_of_complete_linear_order
+  lattice.conditionally_complete_linear_order.to_conditionally_complete_lattice

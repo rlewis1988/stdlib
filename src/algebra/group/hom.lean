@@ -391,3 +391,7 @@ end monoid_hom
 /-- Additive group homomorphisms preserve subtraction. -/
 @[simp] theorem add_monoid_hom.map_sub {G H} [add_group G] [add_group H] (f : G →+ H) (g h : G) :
   f (g - h) = (f g) - (f h) := f.map_add_neg g h
+
+attribute [instance, priority 900]
+  is_add_group_hom.to_is_add_monoid_hom
+  is_group_hom.to_is_monoid_hom

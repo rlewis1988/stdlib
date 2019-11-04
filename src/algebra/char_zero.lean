@@ -40,6 +40,8 @@ ordered_cancel_comm_monoid.char_zero_of_inj_zero $
 λ n h, nat.eq_zero_of_le_zero $
   (@nat.cast_le α _ _ _).1 (le_of_eq h)
 
+attribute [instance, priority 900] linear_ordered_semiring.to_char_zero
+
 namespace nat
 variables {α : Type*} [add_monoid α] [has_one α] [char_zero α]
 

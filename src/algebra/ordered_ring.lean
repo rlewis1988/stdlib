@@ -498,3 +498,21 @@ begin
 end
 
 end with_top
+
+attribute [instance, priority 900]
+  canonically_ordered_comm_semiring.to_canonically_ordered_monoid
+  nonneg_ring.to_zero_ne_one_class
+  linear_nonneg_ring.to_linear_ordered_ring
+  nonneg_ring.to_ring
+  linear_nonneg_ring.to_linear_order
+  linear_ordered_semiring.to_no_top_order
+  linear_nonneg_ring.to_decidable_linear_ordered_comm_ring
+  to_domain
+  canonically_ordered_comm_semiring.to_zero_ne_one_class
+  nonneg_ring.to_nonneg_comm_group
+  linear_ordered_semiring.to_no_bot_order
+  canonically_ordered_comm_semiring.to_comm_semiring
+  linear_nonneg_ring.to_nonneg_ring
+  nonneg_ring.to_ordered_ring
+  linear_nonneg_ring.to_nonneg_comm_group
+  linear_nonneg_ring.to_domain

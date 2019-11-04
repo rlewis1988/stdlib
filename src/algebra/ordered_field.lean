@@ -237,3 +237,8 @@ lemma div_nonneg' {a b : α} (ha : 0 ≤ a) (hb : 0 ≤ b) : 0 ≤ a / b :=
 (lt_or_eq_of_le hb).elim (div_nonneg ha) (λ h, by simp [h.symm])
 
 end
+
+attribute [instance, priority 900]
+  linear_ordered_field.to_densely_ordered
+  linear_ordered_field.to_no_bot_order
+  linear_ordered_field.to_no_top_order

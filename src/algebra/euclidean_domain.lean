@@ -343,3 +343,9 @@ instance discrete_field.to_euclidean_domain {K : Type u} [discrete_field K] : eu
     acc.intro _ $ λ c ⟨hc, hnb⟩, false.elim $ hnb hb,
   remainder_lt := λ a b hnb, ⟨if_neg hnb, hnb⟩,
   mul_left_not_lt := λ a b hnb ⟨hab, hna⟩, or.cases_on (mul_eq_zero.1 hab) hna hnb }
+
+attribute [instance, priority 900]
+  discrete_field.to_euclidean_domain
+  euclidean_domain.has_div
+  euclidean_domain.integral_domain
+  euclidean_domain.has_mod
