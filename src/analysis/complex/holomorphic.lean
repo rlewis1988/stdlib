@@ -10,10 +10,28 @@ notation `ℍ` := complex.half_plane
 @[simp] lemma complex.half_plane_def {z : ℂ} : z ∈ ℍ ↔ 0 < z.im :=
 by simp [complex.half_plane]
 
-lemma half_plane_open : is_open ℍ :=
-sorry
-
 open complex
+
+lemma half_plane_open : is_open ℍ :=
+begin
+  rw [metric.is_open_iff, complex.half_plane],
+  intros z hz,
+  use [z.im, hz],
+  intros x hx,
+  change _ < _ at hz,
+  change _ < _ at hx,
+  change _ < _,
+  rw [complex.dist_eq, complex.abs, complex.norm_sq] at hx,
+  have hx' := pow_lt_pow_of_lt_left hx (real.sqrt_nonneg _) (show 0 < 2, by norm_num),
+  { rw [real.sqr_sqrt, ←lt_sub_iff_add_lt, sub_im] at hx',
+    { replace hx' := lt_of_le_of_lt (mul_self_nonneg _) hx',
+      have hx'' : 0 < (2*z.im)*x.im - x.im^2,
+      { convert hx' using 1, ring },
+      replace hx'' := lt_of_le_of_lt (pow_two_nonneg _) (lt_of_sub_pos hx''),
+      apply pos_of_mul_pos_left hx'',
+      linarith },
+    exact add_nonneg (mul_self_nonneg _) (mul_self_nonneg _) }
+end
 
 def holomorphic_at_on (f : ℂ → ℂ) (u : set ℂ) (z : ℂ) : Prop :=
 ∃ v ⊆ u, is_open v ∧ z ∈ v ∧ differentiable_on ℂ f v
