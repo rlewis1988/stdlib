@@ -442,6 +442,44 @@ meta def dangerous_instance (d : declaration) : tactic (option string) := do
   no_errors_found := "No dangerous instances",
   errors_found := "DANGEROUS INSTANCES FOUND.\nThese instances are recursive, and create a new type-class problem which will have metavariables. Currently this linter does not check whether the metavariables only occur in arguments marked with `out_param`, in which case this linter gives a false positive." }
 
+meta def expr.nth_arg : expr → ℕ → option expr
+| (expr.pi n bi tp bd) 0 := tp
+| (expr.pi n bi tp bd) (k+1) := expr.pi n bi tp <$> expr.nth_arg bd k
+| _ _ := none
+
+meta def expr.arg_goals : expr → (expr → expr) → list expr
+| (expr.pi n bi tp bd) state := state tp :: expr.arg_goals bd (state ∘ expr.pi n bi tp)
+| e state := [state e]
+
+meta def try_to_solve_with (tgt : expr) (tac : tactic unit) : tactic string :=
+do (s, _) ← solve_aux tgt (do intros, s ← target, try_for 1500 tac, done, return s),
+   to_string <$> pp s
+
+meta def solve_arg_goal (tgt : expr) : tactic (option string) :=
+let return_str := λ tac goal : string, some $ goal ++ " : by " ++ tac in
+do tt ← is_prop tgt | return none,
+return_str "apply_instance" <$> try_to_solve_with tgt apply_instance <|>
+return_str "simp *" <$> try_to_solve_with tgt `[simp *] <|>
+return none
+
+def list.drop_last {α} : list α → list α
+| [] := []
+| [a] := []
+| (h::t) := h::list.drop_last t
+
+meta def provable_args (d : declaration) : tactic (option string) :=
+do arg_goals ← (d.type.arg_goals id).drop_last.mmap solve_arg_goal,
+   let arg_goals := (list.iota arg_goals.length).zip arg_goals,
+   let solved_args : list (ℕ × string) :=
+     arg_goals.filter_map $ λ ⟨n, o⟩, option.cases_on o none (some ∘ prod.mk n),
+   if solved_args.length = 0 then return none else some <$> print_arguments solved_args
+
+
+@[linter, priority 1400] meta def linter.provable_args : linter :=
+{ test := provable_args,
+  no_errors_found := "No arguments are (easily) provable from earlier arguments",
+  errors_found := "ARGUMENTS ARE EASILY PROVABLE FROM EARLIER ARGUMENTS" }
+
 /- Implementation of the frontend. -/
 
 /-- `get_checks slow extra use_only` produces a list of linters.
