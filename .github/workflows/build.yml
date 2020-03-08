@@ -22,4 +22,7 @@ jobs:
           lean_file_hash="$(echo `find src | grep '[.]lean$' | sort | xargs shasum` `shasum leanpkg.toml` "lean --version:" `lean --version` | shasum | head -c 40; echo)"
           echo "lean file hash: $lean_file_hash"
           echo "::set-env name=lean_file_hash::$lean_file_hash"
+          echo `find src | grep '[.]lean$' | sort | xargs shasum`
+          echo  `shasum leanpkg.toml`
+          echo `lean --version`
           echo `shasum src/tactic/linarith.lean`
