@@ -99,6 +99,7 @@ jobs:
       - name: lint
         if: always() && steps.build.outputs.build-successful == '0'
         run: |
+          echo ${{ steps.build.outputs.build-successful }}
           ./scripts/mk_all.sh
           lean --run scripts/lint_mathlib.lean
           mv nolints.txt scripts/nolints.txt
