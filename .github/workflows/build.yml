@@ -96,12 +96,6 @@ jobs:
           name: ${{ steps.setup_precompiled.outputs.artifact_name }}
           path: ..
 
-      - name: tests
-        if: always() && steps.build.outputs.build-successful == 0
-        run: |
-          set -o pipefail
-          lean --make docs archive roadmap test | cat
-
       - name: lint
         if: always() && steps.build.outputs.build-successful == 0
         run: |
@@ -117,6 +111,12 @@ jobs:
           ./scripts/update_nolints.sh
         env:
           DEPLOY_NIGHTLY_GITHUB_TOKEN: ${{ secrets.DEPLOY_NIGHTLY_GITHUB_TOKEN }}
+
+      - name: tests
+        if: always() && steps.build.outputs.build-successful == 0
+        run: |
+          set -o pipefail
+          lean --make docs archive roadmap test | cat
 
       - name: leanchecker
         run: |
