@@ -48,9 +48,9 @@ jobs:
         run: |
           leanpkg build | python scripts/detect_errors.py
           echo "::set-output name=build-successful::$?"
-        outputs:
-          build-successful:
-            description: 'true if the build was successful'
+        # outputs:
+        #   build-successful:
+        #     description: 'true if the build was successful'
 
       - name: configure git setup
         if: always()
