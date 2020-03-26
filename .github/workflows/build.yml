@@ -47,7 +47,9 @@ jobs:
         id: build
         run: |
           leanpkg build | python scripts/detect_errors.py
-          echo "::set-output name=build-successful::$?"
+          status="$?"
+          echo "status: $status"
+          echo "::set-output name=buildsuccessful::$status"
         # outputs:
         #   build-successful:
         #     description: 'true if the build was successful'
@@ -97,9 +99,9 @@ jobs:
           path: ..
 
       - name: lint
-        if: always() && steps.build.outputs.build-successful == '0'
+        if: always() && steps.build.outputs.buildsuccessful == '0'
         run: |
-          echo ${{ steps.build.outputs.build-successful }}
+          echo "success? ${{ steps.build.outputs.buildsuccessful }}"
           ./scripts/mk_all.sh
           lean --run scripts/lint_mathlib.lean
           mv nolints.txt scripts/nolints.txt
@@ -114,7 +116,7 @@ jobs:
           DEPLOY_NIGHTLY_GITHUB_TOKEN: ${{ secrets.DEPLOY_NIGHTLY_GITHUB_TOKEN }}
 
       - name: tests
-        if: always() && steps.build.outputs.build-successful == '0'
+        if: always() && steps.build.outputs.buildsuccessful == '0'
         run: |
           set -o pipefail
           lean --make docs archive roadmap test | cat
