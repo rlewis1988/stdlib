@@ -97,7 +97,7 @@ jobs:
           path: ..
 
       - name: lint
-        if: always() && steps.build.outputs.build-successful == 0
+        if: always() && steps.build.outputs.build-successful == '0'
         run: |
           ./scripts/mk_all.sh
           lean --run scripts/lint_mathlib.lean
@@ -113,7 +113,7 @@ jobs:
           DEPLOY_NIGHTLY_GITHUB_TOKEN: ${{ secrets.DEPLOY_NIGHTLY_GITHUB_TOKEN }}
 
       - name: tests
-        if: always() && steps.build.outputs.build-successful == 0
+        if: always() && steps.build.outputs.build-successful == '0'
         run: |
           set -o pipefail
           lean --make docs archive roadmap test | cat
