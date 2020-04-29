@@ -476,6 +476,7 @@ The core simplification routine of `norm_cast`.
 -/
 meta def derive (e : expr) : tactic (expr × expr) :=
 do
+  trace "norm_cast*",
   cache ← norm_cast_attr.get_cache,
   e ← instantiate_mvars e,
   let cfg : simp_config := {
